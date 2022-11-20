@@ -2,15 +2,24 @@
 title: "CFUassay Figure for Gat201 paper"
 author: "Liz Hughes"
 date: "31/10/2022"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
+  word_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE , warning=FALSE, message=FALSE)
 ```
 
 
-#up arrow + fn + L = |
+up arrow + fn + L = |
 
 ```{r}
 
@@ -24,8 +33,6 @@ library(tidyr)
 theme_set(theme_bw())
 library(ggnewscale)
 library(knitr)
-
-
 library(markdown)
 
  
@@ -34,22 +41,28 @@ library(markdown)
 
 
 # Cfu Assay.
+
 I have collated OD measurements and average cell counts (from Cfu assays).
 
-31-10-2021 Comparison of growth of H99 and Gat 201 mutant (003; Madhan) and 2 Gat201 complemented strains into the Madhani deletion in RPMI at 37 degrees over an 60 hour time course.
+31-10-2022 Comparison of growth of H99 and Gat 201 mutant (003; Madhan) and 2 Gat201 complemented strains into the Madhani deletion background in RPMI and RPMI + Serum (10% FBS) at 37 degrees over a 60 hour time course. Samples were collected at 4, 12, 24, 36, 48 and 60 hours post inoculation into fresh media.
+
+Samples were collected at 4, 12, 24, 36, 48 and 60 hours post inoculation into fresh media. A 1:10 deletion series was carries out from neat to 10e-4. 100 microlitres of dilutions 10e3 and 10e4 were plated out onto YPD Agar, incubated for 48 hours and colonies counted.
+
+The average of cells/ml over the 2 deletions were used as input for the data analysis.
 
 ## Read in data as csv file
 
 ```{r Cfu_data}
 
-rawdata <- read.csv("~/Edward Wallace/Lab based Work/ComplementedCloneChecks/221025_Cfu_RRS_60h/221025_Cfu60_RRS.csv")
+rawdata <- read.csv("../Input/221025_Cfu60_RRS.csv")
 
 ```
 
 ## Create Cfu plot
+### First look at data.
 
 
-```{r}
+```{r plot all}
 
 rawdata_day <- mutate(rawdata, 
                       Time = Time/24, 
@@ -58,73 +71,27 @@ rawdata_day <- mutate(rawdata,
 
 
 Cfu_Plot <- ggplot(rawdata_day,
-                    aes(x=Time, y=Cells, colour = Strain)) +
-    geom_point(aes(shape = BioRep), size=3) +
+                      aes(x=Time, y=Cells, colour = Strain)) +
+            geom_point(aes(shape = BioRep), size=3) +
    
-    labs(x="Time (Days)", 
-         y="Number of Cells/ml", 
-         title = "Cfu assay at 37⁰C") +
-    theme(text = element_text(size = 22)) +
-    scale_x_continuous(expand = c(0, 0), breaks = 0:3, limits = c(0,3)) + 
-    scale_y_continuous(breaks = c(10, 100000,  1000000, 10000000))+
-    theme(axis.text.x = element_text(angle = 90, hjust=1, vjust = 0.25, size = 14))+
-    theme(axis.text.y = element_text(size= 12))+
-    scale_color_brewer(palette="Dark2")
+                      labs(x="Time (Days)", 
+                           y="Number of Cells/ml", 
+                      title = "Cfu assay at 37⁰C") +
+                      theme(text = element_text(size = 22)) +
+                      scale_x_continuous(expand = c(0, 0), breaks = 0:3, limits = c(0,3)) + 
+                      scale_y_continuous(breaks = c(10, 100000,  1000000, 10000000))+
+                      theme(axis.text.x = element_text(angle = 90, hjust=1, vjust = 0.25, size = 14))+
+                      theme(axis.text.y = element_text(size= 12))+
+                      scale_color_brewer(palette="Dark2")
 
 
 Cfu_Plot
 ```
 
 
+## Create mean Cfu plot all: Solid line
 
-
-
-
-
-```{r plot_all}
-
-rawdata_day<-mutate(rawdata, Time = Time/24)
-
-
-
-Cfu_Plot <- ggplot(rawdata_day,
-                  aes(x=Time, y=Cells, colour = Strain)) +
-   geom_point(aes(shape = BioRep), size=3) +
-                  labs(x="Time (Days)", 
-                       y="Number of Cells/ml", 
-                       title = "Gat201 Complemented Strains") +
-                  scale_x_continuous(expand = c(0, 0), breaks = 0:4, limits = c(0,4)) + 
-                  scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
-                                     breaks = c(0, 100000,  1000000, 10000000)) +
-  facet_grid(Media ~ .) +
-  
-  theme(
-  
-    plot.title = element_text(size = 20, face = "bold", hjust = 0.5,family = "sans"),
-    axis.title = element_text(size =20, face = "bold", colour = "black",family = "sans"),
-    axis.text = element_text(size = 20,family = "sans"),
-    axis.text.x = element_text(hjust =1),
-    axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
-    panel.background = element_rect(fill = "white"), 
-    axis.ticks = element_line(colour = "black", size = 1),
-    axis.ticks.length = unit(0.25, "cm"),
-    legend.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.text = element_text(size = 16, face = "bold")
-    )
-                 
-                  
-Cfu_Plot
-
-
-
-```
-
-
-
-
-## Create mean Cfu plot
-
-```{r plot_all_mean}
+```{r plot_all_mean_solid}
 
 rawdata_day<-mutate(rawdata, Time = Time/24)
 
@@ -135,155 +102,149 @@ Cfu_Plot <- ggplot(rawdata_day,
                   labs(x="Time (Days)", 
                        y="Number of Cells/ml", 
                        title = "Gat201 Complemented Strains") +
-                   scale_x_continuous(expand = c(0, 0), breaks = 0:3, limits = c(0,3)) + 
+                  scale_x_continuous(expand = c(0, 0), breaks = 0:3, limits = c(0,3)) + 
                   scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
                                      breaks = c(0, 100000,  1000000, 10000000)) +
   facet_wrap(Media ~ .) +
   theme(
-  
-    plot.title = element_text(size = 20, face = "bold", hjust = 0.5,family = "sans"),
-    axis.title = element_text(size =20, face = "bold", colour = "black",family = "sans"),
-    axis.text = element_text(size = 15,family = "sans"),
-    axis.text.x = element_text(hjust =0.5),
-    axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
-    panel.background = element_rect(fill = "white"), 
-    axis.ticks = element_line(colour = "black", size = 1),
-    axis.ticks.length = unit(0.25, "cm"),
-    legend.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    legend.text = element_text(size = 16, face = "bold")
-    )
-                 
-                  
-                  
+        plot.title = element_text(size = 20, face = "bold", hjust = 0.5,family = "sans"),
+        axis.title = element_text(size =20, face = "bold", colour = "black",family = "sans"),
+        axis.text = element_text(size = 15,family = "sans"),
+        axis.text.x = element_text(hjust =0.5),
+        axis.line = element_line(colour = "black", size = 1, linetype = "solid"),
+        panel.background = element_rect(fill = "white"), 
+        axis.ticks = element_line(colour = "black", size = 1),
+        axis.ticks.length = unit(0.25, "cm"),
+        legend.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.text = element_text(size = 16, face = "bold")
+        )
 
 Cfu_Plot_mean <-  Cfu_Plot + 
-                  stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "solid", size = 1, panel.background = element_rect(fill = "white"))
+                  stat_summary(aes(group = Strain), 
+                               fun = mean, geom="line", 
+                               linetype = "solid", 
+                               size = 1, 
+                               panel.background = element_rect(fill = "white"))
 
 Cfu_Plot_mean
 
 
 ```
 
+## Create mean Cfu plot all: Dash line
 
 
-
-
-
-
-```{r}
+```{r plot_all_mean_dash}
 
 rawdata_day <- mutate(rawdata, 
-                      Time = Time/24, 
                       BioRep=as.factor(BioRep))
+
 
 Cfu_Plot2 <- ggplot(rawdata_day,
                     aes(x=Time, y=Cells, colour = Strain, alpha = Strain)) +
   
-    geom_point(aes(shape = BioRep), size=1.5)+
-    scale_alpha_manual(values=c(1,1,0.3,0.3))+
-    facet_grid(~Media) +
-    labs(x="Time", 
-         y="Number of Cells/ml", 
-         title = "Cfu assay on complemented strains") +
-    theme(text = element_text(size = 20)) +
-   
-                   scale_x_continuous(expand = c(0, 0), breaks = 0:3, limits = c(0,3)) + 
-    scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
-                       breaks = c(0, 100000, 500000, 1000000, 5000000))+
-    theme(axis.text.x = element_text( hjust=1, vjust = 0.25, size = 14))+
-    theme(axis.text.y = element_text(size= 12))+
-    scale_color_brewer(palette="Dark2")
+            geom_point(aes(shape = BioRep), size=1.5)+
+                      scale_alpha_manual(values=c(1,1,0.3,0.3))+
+                      facet_grid(~Media) +
+                      labs(x="Time", 
+                           y="Number of Cells/ml", 
+                           title = "Cfu assay on complemented strains") +
+                      theme(text = element_text(size = 22)) +
+                      scale_x_continuous(expand = c(0, 0),  breaks = c(0, 4,12, 24,36,48,60)) + 
+                      scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
+                            breaks = c(0, 100000, 500000, 1000000, 5000000))+
+                      theme(axis.text.x = element_text( angle = 90,hjust=1, vjust = 0.25, size = 12))+
+                      theme(axis.text.y = element_text(size= 12))+
+                      scale_color_brewer(palette="Dark2")
 
-Cfu_Plot2 
+Cfu_Plot2_mean <-  Cfu_Plot2 + 
+                   stat_summary(aes(group = Strain), 
+                                fun = mean, geom="line", 
+                                linetype = "dashed")
 
-Cfu_Plot_mean <-  Cfu_Plot2 + 
-    stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "dashed")
 
-
-Cfu_Plot_mean
+Cfu_Plot2_mean
 
 
 ```
 
 
+```{r mean_plot_all_RRS.png}
 
-
-```{r}
-ggsave("~/Edward Wallace/Lab based Work/ComplementedCloneChecks/221025_Cfu_RRS_60h/C26_30_RRS.png",
+ggsave("../Results/mean_plot_all_RRS.png",
        width = 10,height=6)
 ```
 
 
-```{r}
-
-```
+## Create mean Cfu plot WT + Gat201 in RPMI: Dash line
 
 
-
-```{r}
+```{r plot_WTvGat201_RPMI_dash}
 
 rawdata_day <- mutate(rawdata, 
-                      
                       BioRep=as.factor(BioRep))
 
 Cfu_Plot_R <- ggplot(rawdata_day %>%
-                    filter(Media == "RPMI", Strain == "WT" | Strain =="Gat201 del"),
-                    aes(x=Time, y=Cells, colour = Strain)) +
+                      filter(Media == "RPMI", Strain == "WT" | Strain =="Gat201 del"),
+                      aes(x=Time, y=Cells, colour = Strain)) +
   
-    geom_point(aes(shape = BioRep), size=1.5) +
-    facet_grid(~Media) +
-    labs(x="Time (Hrs)", 
-         y="Number of Cells/ml", 
-         title = "Cfu assay: RPMI at 37⁰C") +
-    theme(text = element_text(size = 22)) +
-   
-                   scale_x_continuous(expand = c(0, 0),  breaks = c(0, 4,12, 24,36,48,60)) + 
-    scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
-                       breaks = c(0, 100000, 500000, 1000000, 5000000))+
-    theme(axis.text.x = element_text( angle = 90,hjust=1, vjust = 0.25, size = 12))+
-    theme(axis.text.y = element_text(size= 12))+
-    scale_color_brewer(palette="Dark2")
+              geom_point(aes(shape = BioRep), size=1.5) +
+              facet_grid(~Media) +
+              labs(x="Time (Hrs)", 
+                   y="Number of Cells/ml", 
+                   title = "Cfu assay: RPMI at 37⁰C") +
+              theme(text = element_text(size = 22)) +
+              scale_x_continuous(expand = c(0, 0),  breaks = c(0, 4,12, 24,36,48,60)) + 
+              scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
+                    breaks = c(0, 100000, 500000, 1000000, 5000000))+
+              theme(axis.text.x = element_text( angle = 90,hjust=1, vjust = 0.25, size = 12))+
+              theme(axis.text.y = element_text(size= 12))+
+              scale_color_brewer(palette="Dark2")
 
 Cfu_Plot_mean_R <-  Cfu_Plot_R + 
     stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "dashed")
-
 
 Cfu_Plot_mean_R
 
 ```
 
-```{r}
-ggsave("~/Edward Wallace/Lab based Work/ComplementedCloneChecks/221025_Cfu_RRS_60h/221025_Cfu60_R.png",
+```{r mean_plot_WTvGat201_R.png}
+
+ggsave("../Results//mean_plot_WTvGat201_R.png",
        width = 8,height=6)
 ```
 
 
-```{r}
+## Create mean Cfu plot WT + Gat201 in RPMI + Serum: Dash line
+
+
+```{r plot_WTvGat201_RPMI_S_dash}
 
 rawdata_day <- mutate(rawdata, 
-                      
                       BioRep=as.factor(BioRep))
 
 Cfu_Plot_RS <- ggplot(rawdata_day %>%
                     filter(Media == "RPMI+Serum", Strain == "WT" | Strain =="Gat201 del"),
                     aes(x=Time, y=Cells, colour = Strain)) +
-  
-    geom_point(aes(shape = BioRep), size=1.5) +
-    facet_grid(~Media) +
-    labs(x="Time (Hrs)", 
-         y="Number of Cells/ml", 
-         title = "Cfu assay: RPMI+Serum at 37⁰C") +
-    theme(text = element_text(size = 22)) +
-   
-                   scale_x_continuous(expand = c(0, 0),  breaks = c(0, 4,12, 24,36,48,60)) + 
-    scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
-                       breaks = c(0, 100000, 500000, 1000000, 5000000))+
-    theme(axis.text.x = element_text( angle = 90,hjust=1, vjust = 0.25, size = 12))+
-    theme(axis.text.y = element_text(size= 12))+
-    scale_color_brewer(palette="Dark2")
+          
+              geom_point(aes(shape = BioRep), size=1.5) +
+              facet_grid(~Media) +
+              labs(x="Time (Hrs)", 
+                   y="Number of Cells/ml", 
+                   title = "Cfu assay: RPMI+Serum at 37⁰C") +
+              theme(text = element_text(size = 22)) +
+              scale_x_continuous(expand = c(0, 0),  breaks = c(0, 4,12, 24,36,48,60)) + 
+              scale_y_continuous(trans=scales::pseudo_log_trans(sigma =100000, base =  exp(1)),
+                    breaks = c(0, 100000, 500000, 1000000, 5000000))+
+              theme(axis.text.x = element_text( angle = 90,hjust=1, vjust = 0.25, size = 12))+
+              theme(axis.text.y = element_text(size= 12))+
+              scale_color_brewer(palette="Dark2")
 
 Cfu_Plot_mean_RS <-  Cfu_Plot_RS + 
-    stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "dashed")
+                        stat_summary(aes(group = Strain), 
+                                     fun = mean, 
+                                     geom="line", 
+                                     linetype = "dashed")
 
 
 Cfu_Plot_mean_RS
@@ -292,20 +253,22 @@ Cfu_Plot_mean_RS
 
 
 
-```{r}
-ggsave("~/Edward Wallace/Lab based Work/ComplementedCloneChecks/221025_Cfu_RRS_60h/221025_Cfu60_RS.png",
+```{r mean_plot_WTvGat201_RS.png}
+ggsave("../Results/mean_plot_WTvGat201_RS.png",
        width = 8,height=6)
 ```
 
 
+## Create mean Cfu plot C26 + C30 in RPMI: Dash line
 
-```{r}
+
+```{r mean_Plot_Compl_R}
 
 rawdata_day <- mutate(rawdata, 
                       
                       BioRep=as.factor(BioRep))
 
-Cfu_Plot_R <- ggplot(rawdata_day %>%
+Cfu_Plot_C_R <- ggplot(rawdata_day %>%
                     filter(Media == "RPMI", Strain == "C26" | Strain =="C30"),
                     aes(x=Time, y=Cells, colour = Strain)) +
   
@@ -323,23 +286,23 @@ Cfu_Plot_R <- ggplot(rawdata_day %>%
     theme(axis.text.y = element_text(size= 12))+
     scale_color_brewer(palette="Dark2")
 
-Cfu_Plot_mean_R <-  Cfu_Plot_R + 
+Cfu_Plot_mean_C_R <-  Cfu_Plot_C_R + 
     stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "dashed")
 
 
-Cfu_Plot_mean_R
+Cfu_Plot_mean_C_R
 
 ```
 
+## Create mean Cfu plot C26 + C30 in RPMI + Serum: Dash line
 
-
-```{r}
+```{r mean_Plot_Compl_RS}
 
 rawdata_day <- mutate(rawdata, 
                       
                       BioRep=as.factor(BioRep))
 
-Cfu_Plot_R <- ggplot(rawdata_day %>%
+Cfu_Plot_C_RS <- ggplot(rawdata_day %>%
                     filter(Media == "RPMI+Serum", Strain == "C26" | Strain =="C30"),
                     aes(x=Time, y=Cells, colour = Strain)) +
   
@@ -357,11 +320,11 @@ Cfu_Plot_R <- ggplot(rawdata_day %>%
     theme(axis.text.y = element_text(size= 12))+
     scale_color_brewer(palette="Dark2")
 
-Cfu_Plot_mean_R <-  Cfu_Plot_R + 
+Cfu_Plot_mean_C_RS <-  Cfu_Plot_C_RS + 
     stat_summary(aes(group = Strain), fun = mean, geom="line", linetype = "dashed")
 
 
-Cfu_Plot_mean_R
+Cfu_Plot_mean_C_RS
 
 ```
 
